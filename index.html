@@ -1638,7 +1638,10 @@ async function syncWithDrive(reason='manual'){
     let remote=null;
     if(fileId){remote=await downloadDriveFile(fileId);lastDriveRemote=remote;const beforeLocal=JSON.stringify(getStatePayload());const remoteIds=new Set((remote.transactions||[]).map(x=>String(x.id)));const localNewTx=(state.transactions||[]).filter(x=>!remoteIds.has(String(x.id))).length;const remotePeople=new Set((remote.people||[]).map(x=>String(x.name||'').trim()).filter(Boolean));const localNewPeople=(state.people||[]).filter(x=>x.name&&!remotePeople.has(String(x.name).trim())).length;mergeDriveData(remote);const mergedChanged=JSON.stringify(getStatePayload())!==beforeLocal;
       if(mergedChanged||driveLastLocalMutation>0){const result=await uploadDriveData(folder.id,fileId,drivePayloadWithMeta());if(result.id)localStorage.setItem(DRIVE_FILE_ID_KEY,result.id);addDriveLog('☁️','Drive updated',`${localNewTx} new transaction(s) + ${localNewPeople} new people sent/merged`);}else addDriveLog('📥','Drive checked','Drive copy was already current');
-    }else{const result=await uploadDriveData(folder.id,null,drivePayloadWithMeta());if(result.id)localStorage.setItem(DRIVE_FILE_ID_KEY,result.id);addDriveLog('☁️','Drive file created','VITTAM_Data.json created');}
+      // The merge changes the in-memory state. Refresh every visible section immediately,
+      // otherwise the app can say "Synced" while the old screen is still being shown.
+      render();renderUtilities();renderRenewals();renderTodo();populatePersonSelect();
+    }else{const result=await uploadDriveData(folder.id,null,drivePayloadWithMeta());if(result.id)localStorage.setItem(DRIVE_FILE_ID_KEY,result.id);addDriveLog('☁️','Drive file created','VITTAM_Data.json created');render();renderUtilities();renderRenewals();renderTodo();populatePersonSelect();}
     const stamp=nowIso();localStorage.setItem(DRIVE_LAST_SYNC_KEY,stamp);localStorage.setItem(LAST_BACKUP_KEY,stamp);localStorage.setItem(LAST_BACKUP_FILE_KEY,DRIVE_FILE_NAME);driveLastLocalMutation=0;setDriveStatus('✓ Synced • '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),'ok');updateDriveUi();return true;
   }catch(e){console.error(e);setDriveStatus('⚠️ Sync needs attention: '+e.message,'err');addDriveLog('⚠️','Sync failed',e.message);return false;}finally{driveSyncBusy=false;}}
 async function autoConnectDrive(){if(!getGoogleClientId())return;try{if(!await ensureDriveToken()){setDriveStatus('Drive session needs sign-in. Tap Connect once.','warn');return;}driveAccessToken=driveAccessToken||'';await syncWithDrive('auto');}catch(e){setDriveStatus('Drive session needs sign-in. Tap Connect once.','warn');}}
@@ -2185,7 +2188,19 @@ $('exitLeaveBtn').addEventListener('click',leaveApp);
 window.addEventListener('popstate',()=>{if(!allowExit){history.pushState({mb:true},'',location.href);openExitReminder();}});
 history.replaceState({mb:true},'',location.href);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')syncBeforeClose();});window.addEventListener('pagehide',syncBeforeClose);window.addEventListener('beforeunload',e=>{syncBeforeClose();if(needsBackup()&&!allowExit){e.preventDefault();e.returnValue='';}});
-setTimeout(()=>{updateDriveUi();if(getGoogleClientId()){initDriveAuth();autoConnectDrive();}},900);
+function startDriveAutoConnect(){
+  updateDriveUi();
+  if(!getGoogleClientId())return;
+  let tries=0;
+  const attempt=()=>{
+    tries++;
+    if(window.google?.accounts?.oauth2){initDriveAuth();autoConnectDrive();return;}
+    if(tries<12)setTimeout(attempt,500);
+    else setDriveStatus('Drive sign-in is still unavailable. Open Settings and tap Connect once.','warn');
+  };
+  attempt();
+}
+startDriveAutoConnect();
 window.addEventListener('click',e=>{if(e.target===$('txModal'))closeTx();if(e.target===$('settingsModal'))$('settingsModal').style.display='none';if(e.target===$('utilityModal'))closeUtilityModal();if(e.target===$('renewalModal'))closeRenewalModal();if(e.target===$('exitModal'))closeExitReminder();if(e.target===$('todoModal'))closeTodoModal();});
 document.querySelectorAll('.navBtn').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
 
