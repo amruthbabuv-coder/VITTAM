@@ -1309,6 +1309,9 @@ body:has(.modal[style*="display:block"]) .bottomNav{display:none!important;}
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style id="vittam-drive-people-v2">
 .driveAutoRow{display:flex;gap:10px;align-items:flex-start;padding:12px;margin-top:9px;background:#f6f9ff;border:1px solid #e2eaf7;border-radius:14px}.driveAutoRow input{width:20px;height:20px;margin-top:2px;accent-color:#4f63d9}.driveAutoRow b{display:block;font-size:13px}.driveAutoRow small{display:block;color:#7f8998;font-size:10px;margin-top:2px}.driveLogHead{display:flex;justify-content:space-between;align-items:center;margin:13px 0 7px;font-size:12px}.driveLog{max-height:230px;overflow:auto;border:1px solid #e6ebf2;border-radius:14px;background:#fbfcfe}.driveLogRow{display:flex;gap:9px;padding:9px 10px;border-bottom:1px solid #edf0f4}.driveLogRow:last-child{border-bottom:0}.driveLogRow>span{font-size:18px}.driveLogRow b{display:block;font-size:11px}.driveLogRow small{display:block;font-size:9px;color:#8b95a5;margin-top:2px}.driveLogEmpty{padding:18px;text-align:center;color:#8b95a5;font-size:11px}
+</style><style id="tx-action-fix">.txActions{display:flex;gap:5px;justify-content:flex-end;margin-top:7px;flex-wrap:wrap}.txAction{border:1px solid #dfe5ee;background:#f7f9fc;color:#334155;border-radius:9px;padding:6px 8px;font-size:10px;font-weight:800;cursor:pointer}.txAction.danger{color:#c53c4f;background:#fff5f6;border-color:#ffd8de}.txAction:active{transform:scale(.97)}</style><style id="balance-mood-v1">
+.heroMainValue.balanceNegative{color:#d92f58!important}.heroMainValue.balanceZero{color:#d6a400!important}.heroMainValue.balancePositive{color:#079a75!important}
+.heroMainSub.balanceNegative{color:#d92f58!important}.heroMainSub.balanceZero{color:#c49300!important}.heroMainSub.balancePositive{color:#079a75!important}
 </style></head>
 <body>
 <div class="app">
@@ -1320,7 +1323,7 @@ body:has(.modal[style*="display:block"]) .bottomNav{display:none!important;}
 </header>
 <main class="content" id="mainContent">
 <section class="hero">
-<div class="heroMainBalance"><div class="heroMainLabel">Your Current Balance</div><div class="heroMainValue" id="heroMainValue">₹0</div><div class="heroMainSub">↗ You're in control</div></div>
+<div class="heroMainBalance"><div class="heroMainLabel">Your Current Balance</div><div class="heroMainValue" id="heroMainValue">₹0</div><div class="heroMainSub" id="heroMainSub">🎉 All settled. Enjoy the peace of ₹0.</div></div>
 <span id="orbValue" style="display:none">₹0</span><span id="heroCenter" style="display:none">₹0</span>
 </section>
 <section aria-label="Money actions" class="actionPanel">
@@ -1652,15 +1655,47 @@ function setType(type){state.type=type;document.querySelectorAll('.typeCard').fo
 function populatePersonSelect(){const sel=$('txPerson');if(!sel)return;const names=[...(state.people||[]).map(p=>String(p.name||'').trim()),...state.transactions.map(t=>String(t.person||t.desc||'').trim())].filter(Boolean);const uniq=[...new Set(names)].sort((a,b)=>a.localeCompare(b));sel.innerHTML='<option value="">➕ New person</option>'+uniq.map(n=>'<option value="'+esc(n)+'">👤 '+esc(n)+'</option>').join('');}
 function openTx(type='out'){populatePersonSelect();$('txModal').style.display='block';$('txPerson').value='';$('txNewPerson').value='';$('txAmount').value='';$('txDate').value=new Date().toISOString().slice(0,10);setType(type||'out');setTimeout(()=>$('txPerson').focus(),80);}
 function closeTx(){$('txModal').style.display='none';}
-function addTransaction(){
+let editingTransactionId=null;
+function openTx(type='out',editId=null){
+  populatePersonSelect(); editingTransactionId=editId?String(editId):null;
+  const title=$('txModal').querySelector('h2'), saveBtn=$('saveTx');
+  if(editingTransactionId){
+    const t=state.transactions.find(x=>String(x.id)===editingTransactionId); if(!t){editingTransactionId=null;return;}
+    title.textContent='✏️ Edit transaction'; saveBtn.textContent='Save changes';
+    setType(t.type||'out');
+    const person=String(t.person||t.desc||'');
+    const sel=$('txPerson');
+    if([...sel.options].some(o=>o.value===person)){sel.value=person;$('txNewPerson').value='';$('txNewPerson').style.display='none';}
+    else{sel.value='';$('txNewPerson').value=person;$('txNewPerson').style.display='block';}
+    $('txAmount').value=t.amount;$('txDate').value=t.date||new Date().toISOString().slice(0,10);
+  }else{
+    title.textContent='➕ Add transaction'; saveBtn.textContent='Save transaction'; $('txPerson').value='';$('txNewPerson').value='';$('txNewPerson').style.display='block';$('txAmount').value='';$('txDate').value=new Date().toISOString().slice(0,10);setType(type||'out');
+  }
+  $('txModal').style.display='block';setTimeout(()=>$('txPerson').focus(),80);
+}
+function closeTx(){editingTransactionId=null;$('txModal').style.display='none';}
+function saveTransaction(){
   const selected=$('txPerson').value.trim();const typed=$('txNewPerson').value.trim();const person=selected||typed||'Unnamed';const amount=Number($('txAmount').value);const date=$('txDate').value||new Date().toISOString().slice(0,10);
   if(!Number.isFinite(amount)||amount<=0){alert('Please enter a valid amount.');return;}
-  const stamp=nowIso();const id=DEVICE_ID+'-tx-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
-  state.transactions.unshift({id,type:state.type,desc:person,person,amount,date,createdAt:stamp,updatedAt:stamp});
-  if(!state.people.some(p=>String(p.name).trim()===person))state.people.push({id:'person-'+person.toLowerCase().replace(/[^a-z0-9]+/g,'-'),name:person,createdAt:stamp,updatedAt:stamp});
-  save();addDriveLog('➕','Transaction added',person+' • '+ru(amount));closeTx();render();
+  const stamp=nowIso();
+  if(editingTransactionId){
+    const t=state.transactions.find(x=>String(x.id)===editingTransactionId); if(!t)return;
+    const oldPerson=t.person||t.desc||'Unnamed'; Object.assign(t,{type:state.type,desc:person,person,amount,date,updatedAt:stamp});
+    if(!state.people.some(p=>String(p.name).trim()===person))state.people.push({id:'person-'+person.toLowerCase().replace(/[^a-z0-9]+/g,'-'),name:person,createdAt:stamp,updatedAt:stamp});
+    save();addDriveLog('✏️','Transaction edited',oldPerson+' → '+person+' • '+ru(amount));closeTx();render();
+  }else{
+    const id=DEVICE_ID+'-tx-'+Date.now()+'-'+Math.random().toString(36).slice(2,6);
+    state.transactions.unshift({id,type:state.type,desc:person,person,amount,date,createdAt:stamp,updatedAt:stamp});
+    if(!state.people.some(p=>String(p.name).trim()===person))state.people.push({id:'person-'+person.toLowerCase().replace(/[^a-z0-9]+/g,'-'),name:person,createdAt:stamp,updatedAt:stamp});
+    save();addDriveLog('➕','Transaction added',person+' • '+ru(amount));closeTx();render();
+  }
 }
-function deleteTransaction(id){if(!confirm('Delete this transaction?'))return;state.transactions=state.transactions.filter(t=>Number(t.id)!==Number(id));save();render();}
+function deleteTransaction(id){
+  const t=state.transactions.find(x=>String(x.id)===String(id)); if(!t)return;
+  if(!confirm('Delete this transaction?'))return;
+  const person=t.person||t.desc||'Unnamed'; state.transactions=state.transactions.filter(x=>String(x.id)!==String(id));
+  save();addDriveLog('🗑️','Transaction deleted',person+' • '+ru(t.amount));render();
+}
 function backup(){
   const now=new Date(), stamp=now.toISOString(), fileName='MoneyBalance_Backup_'+now.toISOString().slice(0,10)+'.json';
   const payload={app:'Money Balance',version:5,exportedAt:stamp,profile:state.profile,transactions:state.transactions,utilities:state.utilities,renewals:state.renewals,todos:state.todos};
@@ -1728,14 +1763,14 @@ function typeIcon(t){return{out:'🤝',in:'🤲',returnin:'↩️',returnout:'�
 function render(){
   const txs=state.transactions;const inn=txs.filter(t=>incoming(t.type)).reduce((s,t)=>s+Number(t.amount),0);const out=txs.filter(t=>outgoing(t.type)).reduce((s,t)=>s+Number(t.amount),0);const net=inn-out;
   $('flowIn').textContent=ru(inn);$('flowOut').textContent=ru(out);var netText=net===0?'₹0':(net>0?'+':'−')+ru(Math.abs(net));$('orbValue').textContent=netText;$('heroCenter').textContent=netText;$('heroMainValue').textContent=netText;
-  $('orbValue').style.color=net>0?'#13815f':net<0?'#d64545':'#12396a';$('heroCenter').style.color=net>0?'#13815f':net<0?'#d64545':'#12396a';
+  const hero=$('heroMainValue'),heroSub=$('heroMainSub');const mood=net<0?'negative':net>0?'positive':'zero';if(hero){hero.classList.remove('balanceNegative','balanceZero','balancePositive');hero.classList.add('balance'+mood.charAt(0).toUpperCase()+mood.slice(1));}if(heroSub){heroSub.classList.remove('balanceNegative','balanceZero','balancePositive');heroSub.classList.add('balance'+mood.charAt(0).toUpperCase()+mood.slice(1));const quotes={negative:[['Benjamin Franklin','Beware of little expenses. A small leak will sink a great ship.'],['Warren Buffett','Do not save what is left after spending; spend what is left after saving.'],['Charles A. Jaffe','It is not your salary that makes you rich, it is your spending habits.']],zero:[['Benjamin Franklin','A penny saved is a penny earned.'],['Warren Buffett','Do not save what is left after spending; spend what is left after saving.'],['Proverb','Spend wisely, save consistently.']],positive:[['Ralph Waldo Emerson','Always pay; for first or last you must pay your entire debt.'],['Thomas Jefferson','Never spend your money before you have earned it.'],['Benjamin Franklin','Creditors have better memories than debtors.']]};const q=quotes[mood][new Date().getDate()%quotes[mood].length];heroSub.textContent=(mood==='negative'?'🔴 ':mood==='zero'?'🟡 ':'🟢 ')+q[1]+' — '+q[0];} $('orbValue').style.color=net<0?'#d92f58':net>0?'#079a75':'#d6a400';$('heroCenter').style.color=net<0?'#d92f58':net>0?'#079a75':'#d6a400';
   const total=inn+out,outPct=total?out/total*100:50,inPct=total?100-outPct:50;$('trackOut').style.width=outPct+'%';$('trackIn').style.width=inPct+'%';
   const balances={};txs.forEach(t=>{const k=t.person||t.desc||'Unnamed';const a=Number(t.amount)||0;const delta=t.type==='out'?a:t.type==='returnin'?-a:t.type==='in'?-a:t.type==='returnout'?a:0;balances[k]=(balances[k]||0)+delta;});
   const personNames=[...(state.people||[]).map(p=>String(p.name||'').trim()),...Object.keys(balances)];const people=[...new Set(personNames.filter(Boolean))].map(n=>[n,balances[n]||0]).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
   const totalOwedToMe=people.filter(([,v])=>v>0).reduce((s,[,v])=>s+v,0),totalIOwe=people.filter(([,v])=>v<0).reduce((s,[,v])=>s+Math.abs(v),0);
   $('peopleTotals').innerHTML=`<div class="peopleTotal oweRedT"><b>${ru(totalOwedToMe)}</b><span>💔🪤 THEY OWE ME</span></div><div class="peopleTotal oweGreenT"><b>${ru(totalIOwe)}</b><span>💚💸 I OWE THEM</span></div>`;
   $('people').innerHTML=people.length?people.map(([name,v])=>{return `<div class="personFolder" data-person="${esc(name)}"><div class="folderTab"></div><div class="folderTop"><div class="folderAvatar">${iconFor(name)}</div><div style="min-width:0;flex:1"><div class="folderName">${esc(name)}</div></div><div class="folderArrow">›</div></div><div class="folderBalance"><div><div class="folderLabel ${v>0?'oweRed':v<0?'oweGreen':''}">${v>0?'💔🪤 They owe me':v<0?'💚💸 I owe them':'✓ Settled'}</div><div class="folderAmt ${v>0?'oweRed':v<0?'oweGreen':''}">${v===0?'₹0':ru(Math.abs(v))}</div></div><div class="folderArrow">${v>0?'💔🪤':v<0?'💚💸':'✓'}</div></div></div>`}).join(''):'<div class="empty">No people yet.</div>';
-  $('transactions').innerHTML=txs.length?txs.map(t=>`<div class="tx"><div class="txIcon">${typeIcon(t.type)}</div><div class="txInfo"><div class="txName">${esc(t.person||t.desc)}</div><div class="txMeta">${esc(t.date)} • ${typeLabel(t.type)}</div></div><div class="txRight"><div class="txAmt ${incoming(t.type)?'green':'red'}">${incoming(t.type)?'+':'−'}${ru(t.amount)}</div><button class="deleteBtn" data-delete="${t.id}">Delete</button></div></div>`).join(''):'<div class="empty">No transactions yet.</div>';
+  $('transactions').innerHTML=txs.length?txs.map(t=>`<div class="tx"><div class="txIcon">${typeIcon(t.type)}</div><div class="txInfo"><div class="txName">${esc(t.person||t.desc)}</div><div class="txMeta">${esc(t.date)} • ${typeLabel(t.type)}</div></div><div class="txRight"><div class="txAmt ${incoming(t.type)?'green':'red'}">${incoming(t.type)?'+':'−'}${ru(t.amount)}</div><div class="txActions"><button class="txAction" data-edit="${esc(t.id)}" type="button">✏️ Edit</button><button class="txAction danger" data-delete="${esc(t.id)}" type="button">🗑️ Delete</button></div></div></div>`).join(''):'<div class="empty">No transactions yet.</div>';
   drawNet();
 }
 function openPersonFolder(name){
@@ -2175,10 +2210,10 @@ function renderTodo(){
 function todoSort(a,b){const rank={overdue:0,today:1,upcoming:2,active:3,done:4};const ra=rank[todoState(a)]??3,rb=rank[todoState(b)]??3;if(ra!==rb)return ra-rb;const pa=todoPriorityRank(a.priority),pb=todoPriorityRank(b.priority);if(pa!==pb)return pa-pb;if(a.dueDate&&b.dueDate)return a.dueDate.localeCompare(b.dueDate);return (b.createdAt||0)-(a.createdAt||0);}
 function showTab(tab){const main=$('mainContent'),util=$('utilityPage'),todo=$('todoPage');const navs=document.querySelectorAll('.navBtn');navs.forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));main.style.display='none';util.style.display='none';todo.style.display='none';if(tab==='utilities'){util.style.display='block';window.scrollTo({top:0,behavior:'smooth'});renderUtilities();return;}if(tab==='todo'){todo.style.display='block';window.scrollTo({top:0,behavior:'smooth'});renderTodo();return;}main.style.display='block';window.scrollTo({top:0,behavior:'smooth'});}
 
-$('addBtn').addEventListener('click',openTx);$('txClose').addEventListener('click',closeTx);$('cancelTx').addEventListener('click',closeTx);$('saveTx').addEventListener('click',addTransaction);
+$('addBtn').addEventListener('click',()=>openTx('out'));$('txClose').addEventListener('click',closeTx);$('cancelTx').addEventListener('click',closeTx);$('saveTx').addEventListener('click',saveTransaction);
 $('settingsBtn').addEventListener('click',()=>{renderPersonalization();renderBackupStatus();updateDriveUi();$('settingsModal').style.display='block';});$('saveProfile').addEventListener('click',saveProfile);$('driveConnectBtn').addEventListener('click',requestDriveToken);$('driveSyncNowBtn').addEventListener('click',()=>syncWithDrive('manual'));$('driveAutoSync')?.addEventListener('change',e=>{localStorage.setItem(DRIVE_AUTO_SYNC_KEY,e.target.checked?'1':'0');addDriveLog(e.target.checked?'🔄':'⏸️',e.target.checked?'Automatic sync enabled':'Automatic sync paused','Settings');});$('driveCloseSync')?.addEventListener('change',e=>{localStorage.setItem(DRIVE_CLOSE_SYNC_KEY,e.target.checked?'1':'0');addDriveLog(e.target.checked?'🚪':'⏸️',e.target.checked?'Sync before closing enabled':'Sync before closing paused','Settings');});$('clearDriveLog')?.addEventListener('click',()=>{localStorage.removeItem(DRIVE_LOG_KEY);renderDriveLog();});$('txPerson')?.addEventListener('change',()=>{$('txNewPerson').style.display=$('txPerson').value?'none':'block';});$('saveGoogleClientId').addEventListener('click',()=>{const id=$('googleClientId').value.trim();if(!/^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$/i.test(id)){alert('Please paste a valid Google OAuth Web Client ID.');return;}localStorage.setItem(DRIVE_CLIENT_ID_KEY,id);driveAccessToken='';driveTokenClient=null;setDriveStatus('Client ID saved. Tap “Connect Google Drive”.','ok');updateDriveUi();});$('settingsClose').addEventListener('click',()=>$('settingsModal').style.display='none');$('backupBtn').addEventListener('click',backup);$('restoreFile').addEventListener('change',e=>restore(e.target.files[0]));
 document.querySelectorAll('.typeCard').forEach(card=>card.addEventListener('click',()=>setType(card.dataset.type)));
-$('transactions').addEventListener('click',e=>{const id=e.target.getAttribute('data-delete');if(id)deleteTransaction(id);});$('people').addEventListener('click',e=>{const folder=e.target.closest('.personFolder');if(folder)openPersonFolder(folder.dataset.person);});$('personClose').addEventListener('click',closePersonFolder);
+$('transactions').addEventListener('click',e=>{const del=e.target.closest('[data-delete]'),edit=e.target.closest('[data-edit]');if(edit)openTx('out',edit.dataset.edit);else if(del)deleteTransaction(del.dataset.delete);});$('people').addEventListener('click',e=>{const folder=e.target.closest('.personFolder');if(folder)openPersonFolder(folder.dataset.person);});$('personClose').addEventListener('click',closePersonFolder);
 $('utilityEmoji').addEventListener('change',()=>{$('emojiPreview').textContent=$('utilityEmoji').value;});
 $('utilityCategory').addEventListener('change',()=>{const e=$('utilityEmoji'),defaults={Electricity:'⚡',Water:'💧',Rent:'🏠',Internet:'🌐',Mobile:'📱',Subscription:'🔔',Insurance:'🛡️',Other:'📌'};if(!e.value||Object.values(defaults).includes(e.value))e.value=defaults[$('utilityCategory').value]||'📌';$('emojiPreview').textContent=e.value;});
 $('addUtilityBtn').addEventListener('click',()=>openUtilityModal());$('addRenewalBtn').addEventListener('click',()=>openRenewalModal());$('renewalClose').addEventListener('click',closeRenewalModal);$('cancelRenewal').addEventListener('click',closeRenewalModal);$('saveRenewal').addEventListener('click',saveRenewal);$('renewalList').addEventListener('click',e=>{const a=e.target.closest('[data-r-renew]'),b=e.target.closest('[data-r-edit]'),c=e.target.closest('[data-r-delete]');if(a)renewReminder(a.dataset.rRenew);else if(b)openRenewalModal(b.dataset.rEdit);else if(c)deleteRenewal(c.dataset.rDelete);});$('utilityClose').addEventListener('click',closeUtilityModal);$('cancelUtility').addEventListener('click',closeUtilityModal);$('saveUtility').addEventListener('click',saveUtility);$('utilityTable').addEventListener('click',e=>{const cell=e.target.closest('[data-matrix-id]');if(!cell)return;if(cell.dataset.matrixKind==='bill'){toggleUtilityPaid(cell.dataset.matrixId,cell.dataset.matrixMonth);return;}if(cell.dataset.matrixKind==='renewal'){openRenewalModal(cell.dataset.matrixId);}});$('billManageList').addEventListener('click',e=>{const edit=e.target.closest('[data-u-edit]'),del=e.target.closest('[data-u-delete]');if(edit)openUtilityModal(edit.dataset.uEdit);else if(del)deleteUtility(del.dataset.uDelete);});$('clearBtn').addEventListener('click',()=>{if(confirm('Delete ALL transactions from this device?')){state.transactions=[];state.utilities=[];state.renewals=[];state.todos=[];save();render();renderUtilities();renderRenewals();}});
