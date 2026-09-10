@@ -216,6 +216,16 @@ button,input{font:inherit}button{cursor:pointer}button:active{transform:scale(.9
 .driveSyncCard{margin-top:14px;border:1px solid #dce8fb;border-radius:18px;background:linear-gradient(145deg,#f7fbff,#eef6ff);padding:14px}
 .driveSyncHead{display:flex;gap:10px;align-items:flex-start}.driveSyncIcon{width:42px;height:42px;border-radius:13px;background:#fff;display:grid;place-items:center;font-size:22px;box-shadow:0 4px 12px rgba(37,99,235,.08);flex:0 0 auto}.driveSyncTitle{font-size:14px;font-weight:950;color:#163b70}.driveSyncDesc{font-size:10px;color:#718096;margin-top:3px;line-height:1.4}.driveSyncStatus{margin-top:10px;padding:9px 10px;border-radius:12px;background:#fff;border:1px solid #e5edf8;font-size:10px;color:#667085}.driveSyncStatus.ok{color:#087f5b;background:#effbf6;border-color:#ccefe2}.driveSyncStatus.warn{color:#9a6700;background:#fff9e8;border-color:#f7e5ad}.driveSyncStatus.err{color:#b42318;background:#fff1f0;border-color:#ffd5d1}.driveSyncActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.driveSyncActions .btn{margin:0}.driveSyncMeta{font-size:9px;color:#8b95a5;margin-top:8px;line-height:1.35}.driveSyncClient{margin-top:10px}.driveSyncClient summary{font-size:10px;font-weight:850;color:#52657f;cursor:pointer}.driveSyncClient .field{margin-top:7px;font-size:11px}.driveSyncTiny{font-size:9px;color:#8b95a5;margin-top:5px;line-height:1.35}
 @media(max-width:600px){.driveSyncActions{grid-template-columns:1fr}.driveSyncHead{gap:8px}}
+
+/* Top section menu + non-obstructing bottom navigation */
+.topbarInner{position:relative}
+
+
+
+
+.bottomNav{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;width:auto!important;max-width:none!important;margin:22px 12px 18px!important;height:auto!important;min-height:0!important;padding:7px!important;z-index:20!important}
+.content{padding-bottom:0!important}
+@media(max-width:430px){.bottomNav{margin:18px 10px 14px!important;border-radius:20px!important}}
 </style>
 <style id="readability-upgrade">
 /* ===== READABILITY UPGRADE: larger important text, original icons/graphics preserved ===== */
@@ -1372,25 +1382,134 @@ body{font-weight:500!important;letter-spacing:-.01em!important;}
 .navBtn .navVisual{width:34px!important;height:34px!important;max-height:34px!important;background-size:contain!important;}
 .navBtn .navLabel{font-size:11px!important;line-height:1.1!important;}
 .navBtn.active{background:#edf4fb!important;color:#173b69!important;box-shadow:inset 0 0 0 1px #d8e6f3!important;}
-/* Do not hide navigation when dialogs are open. Dialogs sit above it. */
-body:has(.modal[style*="display: block"]) .bottomNav,
-body:has(.modal[style*="display:block"]) .bottomNav{display:grid!important;}
-#mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:110px!important;}
+/* Sleek full-width bottom navigation: fixed, but never covers content. */
+.bottomNav{position:fixed!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;margin:0!important;padding:6px 12px calc(6px + env(safe-area-inset-bottom))!important;height:70px!important;box-sizing:border-box!important;border-radius:0!important;background:rgba(255,255,255,.96)!important;border:0!important;border-top:1px solid #dce7f2!important;box-shadow:0 -8px 24px rgba(25,55,90,.08)!important;z-index:1000!important;backdrop-filter:blur(10px)!important;}
+.navBtn{height:58px!important;border-radius:14px!important;background:transparent!important;box-shadow:none!important;}
+.navBtn.active{background:#edf4fb!important;color:#173b69!important;box-shadow:inset 0 0 0 1px #d8e6f3!important;}
+#mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:92px!important;}
+@media(max-width:700px){.bottomNav{height:68px!important;padding:5px 8px calc(5px + env(safe-area-inset-bottom))!important}.navBtn{height:56px!important}.navBtn .navVisual{width:29px!important;height:29px!important}.navBtn .navLabel{font-size:10px!important}#mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:88px!important;}}
+</style>
+<style id="sleek-bottom-nav-final">
+/* VITTAM bottom navigation: full width, opaque, fixed, and never transparent over content. */
+.bottomNav{
+ position:fixed!important;left:0!important;right:0!important;bottom:0!important;
+ width:100%!important;max-width:none!important;margin:0!important;
+ box-sizing:border-box!important;height:68px!important;
+ padding:5px 10px calc(5px + env(safe-area-inset-bottom))!important;
+ display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:6px!important;
+ background:#ffffff!important;opacity:1!important;
+ border:0!important;border-top:1px solid #d9e5ef!important;border-radius:0!important;
+ box-shadow:0 -6px 20px rgba(28,61,96,.10)!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ z-index:100000!important;
+}
+.navBtn{height:56px!important;min-height:0!important;padding:3px 4px!important;border-radius:13px!important;background:transparent!important;box-shadow:none!important;}
+.navBtn.active{background:#edf4fb!important;color:#173b69!important;box-shadow:inset 0 0 0 1px #d7e5f2!important;}
+#mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:90px!important;}
+body{padding-bottom:0!important;}
 @media(max-width:700px){
-  .bottomNav{width:calc(100% - 18px)!important;height:74px!important;bottom:max(6px,env(safe-area-inset-bottom))!important;border-radius:20px!important;}
-  .navBtn{height:60px!important;padding:4px 2px!important;border-radius:15px!important;}
-  .navBtn .navVisual{width:31px!important;height:31px!important;max-height:31px!important;}
-  .navBtn .navLabel{font-size:10px!important;}
-  #mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:102px!important;}
+ .bottomNav{height:66px!important;padding:4px 7px calc(4px + env(safe-area-inset-bottom))!important;gap:4px!important;}
+ .navBtn{height:55px!important;border-radius:12px!important;}
+ .navBtn .navVisual{width:29px!important;height:29px!important;}
+ .navBtn .navLabel{font-size:10px!important;}
+ #mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:86px!important;}
+}
+</style>
+<style id="vittam-final-navigation-and-gantt-polish">
+/* FINAL NAV: full-width, opaque, quiet, and never shows content through it. */
+.topMenuWrap,.topMenuBtn,.topMenu{display:none!important}
+.bottomNav{
+  position:fixed!important;left:0!important;right:0!important;bottom:0!important;
+  width:100%!important;max-width:none!important;height:64px!important;
+  margin:0!important;padding:5px 14px calc(5px + env(safe-area-inset-bottom))!important;
+  box-sizing:border-box!important;transform:none!important;
+  display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:6px!important;
+  background:#fff!important;border:0!important;border-top:1px solid #dfe7f0!important;
+  border-radius:0!important;box-shadow:0 -5px 18px rgba(25,55,90,.10)!important;
+  backdrop-filter:none!important;z-index:99999!important;opacity:1!important;
+}
+.bottomNav .navBtn{
+  height:54px!important;min-height:0!important;padding:4px 4px!important;
+  border-radius:12px!important;background:transparent!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:1px!important;color:#66758a!important;font-weight:600!important;font-size:10px!important;
+}
+.bottomNav .navBtn.active{background:#edf4fb!important;color:#173b69!important;box-shadow:inset 0 0 0 1px #d8e6f3!important}
+.bottomNav .navBtn .navVisual{width:27px!important;height:27px!important;max-height:27px!important;margin:0 0 1px!important}
+.bottomNav .navBtn .navLabel{font-size:10px!important;line-height:1.1!important;font-weight:600!important}
+#mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:82px!important}
+@media(max-width:430px){
+  .bottomNav{height:62px!important;padding:4px 8px calc(4px + env(safe-area-inset-bottom))!important}
+  .bottomNav .navBtn{height:53px!important}
+  #mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:78px!important}
 }
 
-/* Gantt has one heading icon only. */
-.ganttPro .ganttHeader>div:first-child:before{display:none!important;content:none!important;}
-.ganttPro .ganttHeader b{font-weight:750!important;}
+/* Compact the app. Remove accidental large gaps while keeping breathing room. */
+.content{padding-top:0!important}
+.hero{margin-bottom:10px!important}
+.section,.utilityToolbar,.calendarWrap,.utilityTableWrap,.todoHero,.todoToolbar,.todoViewSwitch,.ganttPro{margin-bottom:10px!important}
+.section{padding-top:14px!important;padding-bottom:14px!important}
+.quickGrid{gap:8px!important}
+.quick{min-height:68px!important;padding:11px!important}
+.peopleGrid{gap:9px!important}
+.personFolder{min-height:0!important;padding:12px!important}
+.todoHero{padding:15px!important}
+.todoAdd{margin-bottom:9px!important}
+.todoList{gap:7px!important}
+.todoCard,.todoItem,.todoRow{min-height:0!important}
+.ganttWrap,.ganttPro{margin-top:10px!important}
 
-/* Keep ordinary app text lighter and easier to scan. */
-.sectionTitle,.todoTitle,.utilityTitle,.ganttTaskInfo strong,.todoText,.folderName{font-weight:700!important;}
-.btn,.quick,.typeCard,.navBtn,.todoAdd,.todoSmallBtn,.renewalAdd{font-weight:600!important;}
+/* Gantt: simpler hierarchy and compact calendar. */
+.ganttWeekCorner{font-size:9px!important;font-weight:600!important;text-transform:none!important;letter-spacing:.2px!important}
+.ganttWeekBand{font-size:9px!important;font-weight:600!important;text-transform:none!important;letter-spacing:.1px!important}
+.ganttDay small{font-size:8px!important;font-weight:400!important;line-height:1!important;color:#7b8797!important}
+.ganttDay b{font-size:16px!important;font-weight:750!important;margin-top:3px!important}
+.ganttTaskInfo,.ganttLane,.ganttCell{height:52px!important;min-height:52px!important}
+.ganttPro .ganttTaskInfo{height:52px!important;min-height:52px!important}
+.ganttPro .ganttLane,.ganttPro .ganttCell{height:52px!important}
+.ganttPro .ganttBar{
+  top:11px!important;height:30px!important;border-radius:0!important;
+  box-shadow:none!important;border:1px solid rgba(55,80,110,.10)!important;
+  color:#24405f!important;padding:0 6px!important;
+}
+/* Light bar = planned duration. Solid fill = elapsed duration. */
+.ganttPro .ganttBar.c0,.ganttPro .ganttBar.role-blue{background:#e5effd!important}
+.ganttPro .ganttBar.c1,.ganttPro .ganttBar.role-green{background:#e5f6ee!important}
+.ganttPro .ganttBar.c2{background:#fff0dd!important}
+.ganttPro .ganttBar.c3,.ganttPro .ganttBar.role-purple{background:#f0e9fb!important}
+.ganttPro .ganttBar.c4{background:#e5f3fb!important}
+.ganttPro .ganttBar.c5{background:#fde9ed!important}
+.ganttPro .ganttBar.c6{background:#e7f5e8!important}
+.ganttPro .ganttBar.c7{background:#f8e9f5!important}
+.ganttPro .ganttBar.c8{background:#e8f2fb!important}
+.ganttPro .ganttBar.c9{background:#faf0df!important}
+.ganttPro .ganttBar.c10{background:#e9edfb!important}
+.ganttPro .ganttBar.c11{background:#e4f5f2!important}
+.ganttPro .ganttBar .ganttElapsed{background:#5b7cdb!important;opacity:1!important}
+.ganttPro .ganttBar.c1 .ganttElapsed,.ganttPro .ganttBar.role-green .ganttElapsed{background:#28a879!important}
+.ganttPro .ganttBar.c2 .ganttElapsed{background:#e49a3c!important}
+.ganttPro .ganttBar.c3 .ganttElapsed,.ganttPro .ganttBar.role-purple .ganttElapsed{background:#9b69d5!important}
+.ganttPro .ganttBar.c4 .ganttElapsed{background:#2d9fd0!important}
+.ganttPro .ganttBar.c5 .ganttElapsed{background:#dc5d72!important}
+.ganttPro .ganttBar.c6 .ganttElapsed{background:#58a85e!important}
+.ganttPro .ganttBar.c7 .ganttElapsed{background:#c777b8!important}
+.ganttPro .ganttBar.c8 .ganttElapsed{background:#4b9bd1!important}
+.ganttPro .ganttBar.c9 .ganttElapsed{background:#c58b38!important}
+.ganttPro .ganttBar.c10 .ganttElapsed{background:#6b79c8!important}
+.ganttPro .ganttBar.c11 .ganttElapsed{background:#35a99b!important}
+.ganttPro .ganttBar strong{color:#27415e!important;font-weight:650!important}
+.ganttPro .ganttBar em{color:#4e627b!important;font-weight:650!important}
+.ganttPro .ganttBar.done{opacity:.62!important}
+.ganttPro .ganttBar.done .ganttElapsed{opacity:.55!important}
+/* No subtasks in the calendar. They remain available inside the task details. */
+.ganttSubBar,.subCount{display:none!important}
+@media(max-width:520px){
+ .ganttPro .ganttTaskInfo{height:50px!important;min-height:50px!important}
+ .ganttPro .ganttLane,.ganttPro .ganttCell{height:50px!important}
+ .ganttPro .ganttBar{top:10px!important;height:28px!important}
+ .ganttDay small{font-size:8px!important;font-weight:400!important}
+ .ganttDay b{font-size:16px!important}
+}
 </style>
 </head>
 <body>
@@ -2157,7 +2276,7 @@ function renderGantt(){
   });
 
   /* Row 2: real calendar weeks. Current week is WEEK 1; future weeks are +2, +3... and previous weeks are -1, -2... */
-  html+='<div class="ganttWeekCorner" style="grid-column:1;grid-row:2">WEEK</div>';
+  html+='<div class="ganttWeekCorner" style="grid-column:1;grid-row:2">week</div>';
   const currentMonday=mondayOf(today);
   let wi=0;
   while(wi<dayCount){
@@ -2166,7 +2285,7 @@ function renderGantt(){
     while(end<dayCount && mondayOf(days[end]).getTime()===weekStart.getTime()) end++;
     const diff=Math.round((weekStart-currentMonday)/604800000);
     const weekLabel=diff===0?1:(diff>0?diff+1:diff);
-    html+='<div class="ganttWeekBand w'+(Math.abs(weekLabel)%4)+' '+(diff===0?'currentWeekBand':'')+'" style="grid-column:'+(wi+2)+' / '+(end+2)+';grid-row:2">WEEK '+weekLabel+'</div>';
+    html+='<div class="ganttWeekBand w'+(Math.abs(weekLabel)%4)+' '+(diff===0?'currentWeekBand':'')+'" style="grid-column:'+(wi+2)+' / '+(end+2)+';grid-row:2">week '+weekLabel+'</div>';
     wi=end;
   }
 
@@ -2186,11 +2305,11 @@ function renderGantt(){
     const ts=t.startDate||t.dueDate||'',te=t.endDate||t.dueDate||'';
     const a=ts?new Date(ts+'T00:00:00'):null,b=te?new Date(te+'T00:00:00'):null;
     const elapsed=(a&&b)?(today<=a?0:today>=b?100:Math.round(((today-a)/Math.max(1,b-a))*100)):0;
-    const delay=todoDelayDays(t),done=!!t.done,subs=Array.isArray(t.subtasks)?t.subtasks:[];
-    const rowH=Math.max(48,Math.min(110,48+Math.min(4,subs.length)*15));
+    const delay=todoDelayDays(t),done=!!t.done;
+    const rowH=52;
     const gridRow=4+rowNo;
 
-    html+='<div class="ganttTaskInfo '+(done?'isDone':'')+'" style="height:'+rowH+'px;grid-row:'+gridRow+'"><span class="rowNum">'+rowNo+'</span><strong title="'+esc(t.text)+'"><span class="ganttRoleDot">'+roleIcon[cat]+'</span> '+esc(t.text)+(subs.length?' <i class="subCount">+'+subs.length+'</i>':'')+'</strong></div>';
+    html+='<div class="ganttTaskInfo '+(done?'isDone':'')+'" style="height:'+rowH+'px;grid-row:'+gridRow+'"><span class="rowNum">'+rowNo+'</span><strong title="'+esc(t.text)+'"><span class="ganttRoleDot">'+roleIcon[cat]+'</span> '+esc(t.text)+'</strong></div>';
     html+='<div class="ganttLane '+(done?'isDoneLane':'')+'" style="height:'+rowH+'px;grid-row:'+gridRow+'">';
 
     for(let k=0;k<dayCount;k++){
@@ -2247,33 +2366,8 @@ function renderGantt(){
     }else{
       html+='<div class="ganttOutside">Outside visible months</div>';
     }
-
-    /* Subtasks are shown as compact sub-bars in the same task row. */
-    if(subs.length){
-      subs.slice(0,4).forEach((sub,i)=>{
-        const subTop=35+i*15,subFill=sub.done?100:elapsed;
-        const subLeft=hasBar?left:6,subWidth=hasBar?width:Math.max(80,DAY_W*2);
-        const subColor=role==='blue'?'#78aee8':role==='green'?'#74c68c':'#ae86dd';
-        html+='<div class="ganttSubBar '+(sub.done?'subDone':'')+'" style="left:'+subLeft+'px;width:'+subWidth+'px;top:'+subTop+'px;background:'+subColor+'"><span class="ganttElapsed" style="width:'+subFill+'%"></span><strong>'+esc(sub.done?'✓ '+sub.text:sub.text)+'</strong><em>'+subFill+'%</em></div>';
-      });
-    }
     html+='</div>';
   });
-
-  if(!arr.length)html+='<div class="ganttEmpty" style="grid-column:1/-1"><div style="font-size:34px">📊</div><b>No tasks yet</b><span>Add a task to build your timeline.</span></div>';
-  html+='</div></div></div>';
-  host.innerHTML=html;
-
-  host.querySelector('[data-gantt-prev]')?.addEventListener('click',()=>{ganttAnchor.setMonth(ganttAnchor.getMonth()-1);renderTodo();});
-  host.querySelector('[data-gantt-next]')?.addEventListener('click',()=>{ganttAnchor.setMonth(ganttAnchor.getMonth()+1);renderTodo();});
-  host.querySelectorAll('[data-gantt-edit]').forEach(x=>x.addEventListener('click',()=>openTodoModal(x.dataset.ganttEdit)));
-
-  /* Start the view around today, but leave the full three-month timeline freely scrollable. */
-  const scroller=host.querySelector('.ganttScroller');
-  if(scroller&&todayVisible){
-    const target=Math.max(0,INFO_W+todayIndex*DAY_W-scroller.clientWidth*0.38);
-    requestAnimationFrame(()=>{scroller.scrollLeft=target;});
-  }
 }
 function guideClassName(status){return status==='overdue'?'overdue':status==='future'?'future':'';}
 
@@ -2323,6 +2417,7 @@ function startDriveAutoConnect(){
 startDriveAutoConnect();
 window.addEventListener('click',e=>{if(e.target===$('txModal'))closeTx();if(e.target===$('settingsModal'))$('settingsModal').style.display='none';if(e.target===$('utilityModal'))closeUtilityModal();if(e.target===$('renewalModal'))closeRenewalModal();if(e.target===$('exitModal'))closeExitReminder();if(e.target===$('todoModal'))closeTodoModal();});
 document.querySelectorAll('.navBtn').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
+
 
 let todoTab='All';
 let todoDetailId=null;
