@@ -1342,6 +1342,56 @@ body:has(.modal[style*="display:block"]) .bottomNav{display:none!important;}
   }
 }
 </style>
+
+<style id="vittam-final-clean-ui">
+/* VITTAM final visual cleanup: modern, readable typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+html,body,button,input,select,textarea{font-family:'Inter',ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif!important;}
+body{font-weight:500!important;letter-spacing:-.01em!important;}
+.sectionTitle,.todoTitle,.utilityTitle,.ganttHeader b,.peopleTable th,.personCell b{letter-spacing:-.025em!important;}
+
+/* Person register/detail must use the same light VITTAM theme as the rest of the app. */
+#personModal .modalBox{background:#f7fbff!important;border:1px solid #d9e6f2!important;color:#17365d!important;box-shadow:0 22px 60px rgba(25,58,95,.20)!important;}
+#personModal .closeRow{border-bottom:1px solid #e3edf6!important;padding-bottom:10px!important;margin-bottom:10px!important;}
+#personModal .closeRow h2{color:#173b69!important;font-weight:750!important;}
+#personModal .closeLight{background:#edf4fb!important;color:#284767!important;border:1px solid #d9e6f2!important;}
+#personModal .personDetailHero{background:linear-gradient(145deg,#eef7ff 0%,#e8f3ff 58%,#f4f1ff 100%)!important;border:1px solid #cfe1f2!important;color:#17365d!important;box-shadow:0 8px 24px rgba(35,82,125,.08)!important;}
+#personModal .personDetailName{color:#173b69!important;font-weight:750!important;}
+#personModal .personDetailSub,#personModal .personDetailNet span,#personModal .detailHint{color:#71839a!important;}
+#personModal .personDetailAvatar{background:#e5f1ff!important;border-color:#cfe1f2!important;}
+#personModal .detailStat{background:rgba(255,255,255,.88)!important;border:1px solid #d8e5f1!important;}
+#personModal .detailStat b{color:#1e3552!important;}
+#personModal .sectionHead{border-bottom-color:#dfe9f2!important;}
+#personModal .sectionTitle{color:#173b69!important;}
+#personModal .folderTx{border-bottom-color:#e4ebf2!important;}
+#personModal .folderTxIcon{background:#eef5fb!important;border:1px solid #dce7f1!important;}
+
+/* Fixed navigation stays visible, but is compact enough that it never covers content. */
+.bottomNav{position:fixed!important;display:grid!important;left:50%!important;right:auto!important;bottom:max(8px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:min(500px,calc(100% - 24px))!important;max-width:500px!important;margin:0!important;padding:6px!important;min-height:0!important;height:78px!important;grid-template-columns:repeat(3,1fr)!important;gap:5px!important;background:rgba(255,255,255,.97)!important;border:1px solid #d9e5f0!important;border-radius:22px!important;box-shadow:0 10px 28px rgba(30,65,100,.16)!important;backdrop-filter:blur(16px)!important;z-index:99999!important;}
+.navBtn{height:64px!important;min-height:0!important;padding:5px 4px!important;border-radius:16px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;font-size:11px!important;font-weight:650!important;}
+.navBtn .navVisual{width:34px!important;height:34px!important;max-height:34px!important;background-size:contain!important;}
+.navBtn .navLabel{font-size:11px!important;line-height:1.1!important;}
+.navBtn.active{background:#edf4fb!important;color:#173b69!important;box-shadow:inset 0 0 0 1px #d8e6f3!important;}
+/* Do not hide navigation when dialogs are open. Dialogs sit above it. */
+body:has(.modal[style*="display: block"]) .bottomNav,
+body:has(.modal[style*="display:block"]) .bottomNav{display:grid!important;}
+#mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:110px!important;}
+@media(max-width:700px){
+  .bottomNav{width:calc(100% - 18px)!important;height:74px!important;bottom:max(6px,env(safe-area-inset-bottom))!important;border-radius:20px!important;}
+  .navBtn{height:60px!important;padding:4px 2px!important;border-radius:15px!important;}
+  .navBtn .navVisual{width:31px!important;height:31px!important;max-height:31px!important;}
+  .navBtn .navLabel{font-size:10px!important;}
+  #mainContent,#utilityPage,#todoPage,.content,.todoPage{padding-bottom:102px!important;}
+}
+
+/* Gantt has one heading icon only. */
+.ganttPro .ganttHeader>div:first-child:before{display:none!important;content:none!important;}
+.ganttPro .ganttHeader b{font-weight:750!important;}
+
+/* Keep ordinary app text lighter and easier to scan. */
+.sectionTitle,.todoTitle,.utilityTitle,.ganttTaskInfo strong,.todoText,.folderName{font-weight:700!important;}
+.btn,.quick,.typeCard,.navBtn,.todoAdd,.todoSmallBtn,.renewalAdd{font-weight:600!important;}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1516,6 +1566,9 @@ Submit application" rows="3" style="min-height:78px;resize:vertical"></textarea>
     <button class="btn btnSecondary full" id="saveGoogleClientId" type="button" style="margin-top:7px">Save Client ID</button>
   </details>
 </div>
+<details class="backupAlternative">
+<summary><span>💾 <b>Alternative: Manual backup</b><small>Use this if Google Drive sync is not enabled</small></span><i>⌄</i></summary>
+<div class="backupAltBody">
 <div class="backupDashboard" id="backupDashboard">
 <div class="backupDashTop"><div><div class="backupEyebrow">BACKUP HEALTH</div><div class="backupDashTitle">Your data safety clock</div><div class="backupDashSub" id="backupStatusText">Checking backup status…</div></div><div class="backupRing" id="backupRing"><div><b id="backupDays">—</b><span>days</span></div></div></div>
 <div class="backupTimeline"><div class="backupTrack"><div class="backupProgress" id="backupProgress"></div></div><div class="backupTicks"><span>BACKUP TAKEN</span><span>NEXT BACKUP</span></div></div>
@@ -1524,6 +1577,8 @@ Submit application" rows="3" style="min-height:78px;resize:vertical"></textarea>
 <button class="btn btnPrimary full" id="backupBtn">☁️ Create backup now</button>
 <div class="backupNote">The app cannot see the exact Android folder path chosen by your browser. It records the backup date and file name here.</div>
 </div>
+</div>
+</details>
 <div class="fontSizePanel">
 <div class="fontSizeHead"><div><div class="fontSizeTitle">🔠 App font size</div><div class="fontSizeDesc">Increase or decrease all app text and icons. Your choice is saved automatically on this device.</div></div><div class="fontSizeValue" id="fontSizeValue">100%</div></div>
 <div class="fontSizeControls"><button aria-label="Decrease font size" class="fontSizeBtn" id="fontSizeDown" type="button">−</button><div class="fontSizeValue" id="fontSizeValue2">100%</div><button aria-label="Increase font size" class="fontSizeBtn" id="fontSizeUp" type="button">+</button></div>
@@ -2090,7 +2145,7 @@ function renderGantt(){
     mi=mj;
   }
 
-  let html='<div class="ganttWrap ganttPro"><div class="ganttHeader"><div><b>📊 Gantt timeline</b><small>Current month + next 3 months • swipe / scroll horizontally</small></div><div class="ganttNav"><button data-gantt-prev aria-label="Previous month">‹</button><button data-gantt-next aria-label="Next month">›</button></div></div>';
+  let html='<div class="ganttWrap ganttPro"><div class="ganttHeader"><div><b>Gantt timeline</b><small>Current month + next 3 months • swipe / scroll horizontally</small></div><div class="ganttNav"><button data-gantt-prev aria-label="Previous month">‹</button><button data-gantt-next aria-label="Next month">›</button></div></div>';
   html+='<div class="ganttScroller"><div class="ganttGrid ganttProGrid" style="--gantt-info-w:'+INFO_W+'px;--gantt-day-w:'+DAY_W+'px;--gantt-day-count:'+dayCount+';grid-template-columns:'+cols+';min-width:0">';
 
   /* Row 1: month */
@@ -2435,7 +2490,20 @@ initFontSize();
   if(a){ new MutationObserver(sync).observe(a,{childList:true,characterData:true,subtree:true}); }
 })();
 </script>
-<script id="reference-center-addtx">document.addEventListener('DOMContentLoaded',function(){var c=document.querySelector('.addTxCard');if(c&&typeof openTx==='function')c.addEventListener('click',openTx);});</script></body>
+<script id="reference-center-addtx">document.addEventListener('DOMContentLoaded',function(){var c=document.querySelector('.addTxCard');if(c&&typeof openTx==='function')c.addEventListener('click',openTx);});</script>
+<style id="settings-and-scroll-polish-2026-09-10">
+#todoPage .todoList{max-height:none!important;overflow:visible!important;overscroll-behavior:visible!important;touch-action:pan-y!important}
+.bottomNav{bottom:max(10px,env(safe-area-inset-bottom))!important}
+#mainContent,#utilityPage,#todoPage{padding-bottom:calc(105px + env(safe-area-inset-bottom))!important}
+@media(max-width:700px){#mainContent,#utilityPage,#todoPage{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}}
+.driveSyncCard{border:2px solid #bcd3f5!important;box-shadow:0 12px 30px rgba(37,99,235,.10)!important;position:relative}
+.driveSyncCard:before{content:'PRIMARY DATA SYNC';position:absolute;top:-10px;right:14px;background:#eaf2ff;color:#2563eb;border:1px solid #cfe0fb;border-radius:999px;padding:4px 8px;font-size:8px;font-weight:900;letter-spacing:.5px}
+.driveSyncTitle{font-size:18px!important;font-weight:950!important}
+.profileCard{padding:11px!important;background:#fbfcfe!important;box-shadow:none!important;border:1px solid #e7ebf1!important}
+.profileHead{gap:8px!important}.profileAvatar{width:34px!important;height:34px!important;font-size:18px!important}.profileTitle{font-size:13px!important;font-weight:850!important}.profileSub{font-size:9px!important;color:#9aa3b1!important;margin-top:2px!important}.profileGrid{gap:7px!important;margin-top:7px!important}.profileGrid .fieldLabel{font-size:7px!important;letter-spacing:.4px!important;color:#8b95a5!important}.profileGrid .field{min-height:34px!important;padding:7px 9px!important;font-size:12px!important;border-radius:10px!important}#profileEmail{font-size:11px!important;color:#7b8798!important}#saveProfile{min-height:34px!important;padding:8px 10px!important;font-size:10px!important;margin-top:7px!important}.profileSaved{font-size:9px!important}
+.backupAlternative{margin:10px 0 12px;border:1px solid #e5e9f0;border-radius:15px;background:#fafbfd;overflow:hidden}.backupAlternative>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;color:#4d5b70}.backupAlternative>summary::-webkit-details-marker{display:none}.backupAlternative>summary span{display:flex;flex-direction:column;gap:2px}.backupAlternative>summary b{font-size:12px;font-weight:850}.backupAlternative>summary small{font-size:9px;color:#929baa}.backupAlternative>summary i{font-style:normal;font-size:15px;color:#8994a4}.backupAlternative[open]>summary{background:#f5f8fc;border-bottom:1px solid #e5e9f0}.backupAltBody{padding:10px}.backupAltBody .backupDashboard{margin:0!important}.backupAlternative .backupDashboard{border-radius:14px!important;box-shadow:none!important}
+</style>
+</body>
 <style id="bills-bright-redesign-v2">
 :root{
  --bright-bg:#f6f7fb;--bright-card:#ffffff;--bright-ink:#172033;--bright-muted:#7a8496;
@@ -2498,7 +2566,7 @@ initFontSize();
 
 /* Task pad comes before Gantt. */
 #todoGantt{margin-top:12px!important}
-.todoList{max-height:330px!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important}
+.todoList{max-height:none!important;overflow:visible!important;-webkit-overflow-scrolling:auto!important}
 
 /* Task detail is a true top-level overlay, never visually underneath sticky Gantt pieces. */
 #todoDetailModal,#todoModal{z-index:50000!important;position:fixed!important;inset:0!important;isolation:isolate!important}
