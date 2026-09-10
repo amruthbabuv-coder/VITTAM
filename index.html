@@ -2368,6 +2368,10 @@ function renderGantt(){
     }
     html+='</div>';
   });
+  host.innerHTML=html;
+  host.querySelector('[data-gantt-prev]')?.addEventListener('click',()=>shiftGantt(-30));
+  host.querySelector('[data-gantt-next]')?.addEventListener('click',()=>shiftGantt(30));
+  host.querySelectorAll('[data-gantt-edit]').forEach(el=>el.addEventListener('click',()=>openTodoModal(el.dataset.ganttEdit)));
 }
 function guideClassName(status){return status==='overdue'?'overdue':status==='future'?'future':'';}
 
